@@ -8,13 +8,14 @@ data class Song(
     val n: UInt,
     val duration: UInt,
     val like: Like = Like.Nothing,
-    val artists: List<String>,
-    val album: String,
+    val artists: List<Artist>,
+    val album: Album,
     val path: String,
     val acoustid: String,
-    val year: Int,
+    val year: UInt,
     val format: String,
     val mbid: String,
+    val createdAt: LocalDateTime,
     val lastUpdated: LocalDateTime,
     val joinings: List<Joining>
     )
@@ -22,8 +23,3 @@ data class Song(
 enum class Like {
     Like, Nothing, Dislike
 }
-
-data class Joining(
-    val id: ULong,
-    val joinhrase: String
-)
