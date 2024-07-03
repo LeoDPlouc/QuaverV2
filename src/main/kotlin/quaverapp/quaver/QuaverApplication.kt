@@ -6,6 +6,7 @@ import org.springframework.boot.runApplication
 @SpringBootApplication
 class QuaverApplication
 
+
 fun main(args: Array<String>) {
 	runApplication<QuaverApplication>(*args)
 }
