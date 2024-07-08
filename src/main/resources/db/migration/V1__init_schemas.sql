@@ -1,6 +1,6 @@
 CREATE TABLE cover (
-    id serial primary key,
-    tiny_url varchar(4096),
+    id serial primary key not null,
+    tiny_url varchar(4096) not null,
     small_url varchar(4096),
     medium_url varchar(4096),
     large_url varchar(4096),
