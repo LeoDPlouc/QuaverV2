@@ -1,13 +1,13 @@
-DROP TABLE song_to_joining_link;
-DROP TABLE song_to_artist_link;
-DROP TABLE song;
-DROP TYPE like_enum;
-DROP TABLE album_to_joining_link;
-DROP TABLE album_to_artist_link;
-DROP TABLE album;
-DROP TABLE joining;
-DROP TABLE artist;
-DROP TABLE cover;
+DROP TABLE IF EXISTS song_to_joining_link;
+DROP TABLE IF EXISTS song_to_artist_link;
+DROP TABLE IF EXISTS song;
+DROP TYPE IF EXISTS like_enum;
+DROP TABLE IF EXISTS album_to_joining_link;
+DROP TABLE IF EXISTS album_to_artist_link;
+DROP TABLE IF EXISTS album;
+DROP TABLE IF EXISTS joining;
+DROP TABLE IF EXISTS artist;
+DROP TABLE IF EXISTS cover;
 
 CREATE TABLE IF NOT EXISTS cover (
                        id serial primary key,

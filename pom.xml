@@ -159,7 +159,17 @@
 						<name>org.jooq.codegen.KotlinGenerator</name>
 						<database>
 							<name>org.jooq.meta.postgres.PostgresDatabase</name>
-							<includes>song</includes>
+							<includes>
+								song |
+								album |
+								album_to_artist_link |
+								album_to_joining_link |
+								artist |
+								cover |
+								joining |
+								song_to_artist_link |
+								song_to_joining_link
+							</includes>
 							<excludes>flyway_schema_history</excludes>
 						</database>
 

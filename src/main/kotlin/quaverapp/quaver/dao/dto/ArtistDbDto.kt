@@ -1,11 +1,11 @@
-package quaverapp.quaver.model
+package quaverapp.quaver.dao.dto
 
 import java.time.LocalDateTime
 
-data class Artist(
-    val id: Int,
+data class ArtistDbDto(
+    val id: Int?,
     val name: String?,
-    val cover: Cover?,
+    val cover: CoverDbDto,
     val mbid: String?,
     val createdAt: LocalDateTime?,
     val updatedAt: LocalDateTime?

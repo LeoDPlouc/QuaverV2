@@ -8,13 +8,10 @@ import java.util.Optional
 
 @Repository
 class CoverDao(private val dsl: DSLContext) {
-    fun getById(id: Int): Optional<Cover> {
-        val cover = dsl.select(*COVER.fields())
+    fun getById(id: Int): Cover? {
+        return dsl.select(*COVER.fields())
             .from(COVER)
             .where(COVER.ID.eq(id))
-            .fetchOne()
-            ?.into(Cover::class.java)
-
-        return Optional.ofNullable(cover)
+            .fetchOne { record -> record.into(Cover::class.java) }
     }
 }
