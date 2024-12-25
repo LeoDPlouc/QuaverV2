@@ -1,31 +1,57 @@
 package quaverapp.quaver.service
 
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchException
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.springframework.boot.test.context.SpringBootTest
+import org.mockito.Mockito.`when`
+import quaverapp.quaver.TestSuite
 import quaverapp.quaver.dao.CoverDao
+import quaverapp.quaver.model.Cover
 import quaverapp.quaver.service.exception.CoverNotFoundException
-import org.mockito.Mockito.`when` as mockitoWhen
 
-@SpringBootTest
-class CoverServiceTest {
+class CoverServiceTest : TestSuite() {
 
     @Mock
-    private lateinit var coverDao: CoverDao
+    lateinit var coverDao: CoverDao
 
     @InjectMocks
-    private lateinit var coverService: CoverService
+    lateinit var coverService: CoverService
 
     @Test
-    fun should_get_cover_by_id() {
+    fun `getById should return cover when cover is found`() {
+        // Arrange
+        val coverId = 1
+        val expectedCover = Cover(
+            id = coverId,
+            tinyUrl = "http://example.com/tiny.jpg",
+            smallUrl = "http://example.com/small.jpg",
+            mediumUrl = "http://example.com/medium.jpg",
+            largeUrl = "http://example.com/large.jpg",
+            veryLargeUrl = "http://example.com/verylarge.jpg"
+        )
+        `when`(coverDao.getById(coverId)).thenReturn(expectedCover)
+
+        // Act
+        val result = coverService.getById(coverId)
+
+        // Assert
+        assertThat(result)
+            .isEqualTo(expectedCover)
     }
 
     @Test
-    fun should_throw_when_getCoverById_return_optional_empty() {
-        mockitoWhen(coverDao.getById(1)).thenReturn(null);
+    fun `getById should throw CoverNotFoundException when cover is not found`() {
+        // Arrange
+        val coverId = 1
+        `when`(coverDao.getById(coverId)).thenReturn(null)
 
-        assertThrows<CoverNotFoundException> { coverService.getById(1)}
+        // Act
+        var thrown = catchException { coverService.getById(coverId) }
+
+        // Assert
+        assertThat(thrown)
+            .isInstanceOf(CoverNotFoundException::class.java)
     }
 }

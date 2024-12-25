@@ -2,6 +2,7 @@ package quaverapp.quaver.service
 
 import org.springframework.stereotype.Service
 import quaverapp.quaver.dao.CoverDao
+import quaverapp.quaver.model.Cover
 import quaverapp.quaver.service.exception.CoverNotFoundException
 import java.util.Optional
 
@@ -9,6 +10,5 @@ import java.util.Optional
 class CoverService(private val coverDao: CoverDao) {
 
     @Throws(CoverNotFoundException::class)
-    fun getById(id: Int) = Optional.ofNullable(coverDao.getById(id))
-            .orElseThrow { CoverNotFoundException(id) }
+    fun getById(id: Int): Cover = coverDao.getById(id) ?: throw CoverNotFoundException(id)
 }
