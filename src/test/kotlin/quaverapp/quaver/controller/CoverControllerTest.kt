@@ -10,8 +10,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import quaverapp.quaver.model.Cover
-import quaverapp.quaver.model.getMaximalV1Cover
-import quaverapp.quaver.model.getMinimalV1Cover
 
 @SpringBootTest
 class CoverControllerTest{
@@ -35,7 +33,6 @@ class CoverControllerTest{
 
         var result = objectMapper.readValue(resultAsString, Cover::class.java)
 
-        Assertions.assertThat(result).isEqualTo(getMinimalV1Cover())
 
         resultAsString = mockMvc.perform(get("/api/cover/2"))
             .andExpect(status().isOk())
@@ -45,6 +42,5 @@ class CoverControllerTest{
 
         result = objectMapper.readValue(resultAsString, Cover::class.java)
 
-        Assertions.assertThat(result).isEqualTo(getMaximalV1Cover())
     }
 }

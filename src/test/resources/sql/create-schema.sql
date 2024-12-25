@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS album (
                        cover_id int references cover(id),
                        year int,
                        mbid varchar(32),
-                       crated_at timestamp,
+                       created_at timestamp,
                        updated_at timestamp,
                        cover_updated_at timestamp
 );

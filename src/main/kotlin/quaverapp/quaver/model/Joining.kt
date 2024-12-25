@@ -1,8 +1,8 @@
 package quaverapp.quaver.model
 
 data class Joining(
-    val id: ULong,
-    val n: UInt,
-    val artistId: ULong,
+    val id: Int,
+    val n: Int,
+    val artistId: Int,
     val joinphrase: String
 )

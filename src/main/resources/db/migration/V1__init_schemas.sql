@@ -10,7 +10,7 @@ CREATE TABLE cover (
 CREATE TABLE artist (
     id serial primary key,
     name text,
-    cover_id int references cover(id),
+    cover_id int references cover(id) on delete set null,
     mbid varchar(32),
     created_at timestamp,
     updated_at timestamp
@@ -19,30 +19,30 @@ CREATE TABLE artist (
 CREATE TABLE joining (
     id serial primary key,
     n int,
-    artist_id int references artist(id),
+    artist_id int references artist(id) on delete cascade,
     joinphrase varchar(20)
 );
 
 CREATE TABLE album (
     id serial primary key,
     title text,
-    cover_id int references cover(id),
+    cover_id int references cover(id) on delete set null,
     year int,
     mbid varchar(32),
-    crated_at timestamp,
+    created_at timestamp,
     updated_at timestamp,
     cover_updated_at timestamp
 );
 
 CREATE TABLE album_to_artist_link (
-    album_id int references album(id),
-    artist_id int references artist(id),
+    album_id int references album(id) on delete cascade,
+    artist_id int references artist(id) on delete cascade,
     primary key (album_id, artist_id)
 );
 
 CREATE TABLE album_to_joining_link (
-    album_id int references album(id),
-    joining_id int references joining(id),
+    album_id int references album(id) on delete cascade,
+    joining_id int references joining(id) on delete cascade,
     primary key (album_id, joining_id)
 );
 
@@ -54,7 +54,7 @@ CREATE TABLE song (
     n int,
     duration int,
     "like" like_enum,
-    album_id int references album(id),
+    album_id int references album(id) on delete set null,
     path varchar(4096),
     acoustid text,
     year int,
@@ -65,13 +65,13 @@ CREATE TABLE song (
 );
 
 CREATE TABLE song_to_artist_link (
-    song_id int references song(id),
-    artist_id int references artist(id),
+    song_id int references song(id) on delete cascade,
+    artist_id int references artist(id) on delete cascade,
     primary key (song_id, artist_id)
 );
 
 CREATE TABLE song_to_joining_link (
-    song_id int references song(id),
-    joining_id int references joining(id),
+    song_id int references song(id) on delete cascade,
+    joining_id int references joining(id) on delete cascade,
     primary key (song_id, joining_id)
 );

@@ -1,24 +1,29 @@
 package quaverapp.quaver.dao
 
 import org.assertj.core.api.Assertions.assertThat
-import org.jooq.generated.quaver.public.tables.references.*
+import org.jooq.generated.quaver.public.tables.references.ALBUM
+import org.jooq.generated.quaver.public.tables.references.ALBUM_TO_ARTIST_LINK
+import org.jooq.generated.quaver.public.tables.references.ARTIST
+import org.jooq.generated.quaver.public.tables.references.COVER
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import quaverapp.quaver.IntegrationTest
-import quaverapp.quaver.model.*
+import quaverapp.quaver.model.Album
+import quaverapp.quaver.model.Artist
+import quaverapp.quaver.model.Cover
 import java.time.LocalDateTime
 
-class SongDaoIntegrationTest : IntegrationTest() {
-    @Autowired
-    private lateinit var songDao: SongDao
+class AlbumDaoTest : IntegrationTest() {
 
-    var artist: Artist? = null
+    @Autowired
+    private lateinit var albumDao: AlbumDao
+
     var album: Album? = null
-    var song: Song? = null
+    var artist: Artist? = null
 
     @BeforeEach
-    fun setup() {
+    fun setUp() {
         artist = Artist(
             id = 1,
             mbid = "mbid",
@@ -55,24 +60,6 @@ class SongDaoIntegrationTest : IntegrationTest() {
             artists = listOf(artist!!),
         )
 
-        song = Song(
-            id = 1,
-            n = 1,
-            title = "title",
-            artists = listOf(artist!!),
-            createdAt = LocalDateTime.of(2000, 10, 10, 0, 0, 0),
-            joinings = emptyList(),
-            mbid = "mbid",
-            year = 2000,
-            album = album!!,
-            like = Like.Like,
-            path = "/path",
-            lastUpdated = LocalDateTime.of(2000, 10, 10, 0, 0, 0),
-            format = "mp3",
-            acoustid = "acoustid",
-            duration = 20
-        )
-
         dsl.insertInto(COVER)
             .set(COVER.ID, artist?.cover?.id)
             .set(COVER.TINY_URL, artist?.cover?.tinyUrl)
@@ -94,43 +81,21 @@ class SongDaoIntegrationTest : IntegrationTest() {
         dsl.insertInto(ARTIST)
             .set(ARTIST.ID, artist?.id)
             .set(ARTIST.NAME, artist?.name)
+            .set(ARTIST.COVER_ID, artist?.cover?.id)
             .set(ARTIST.MBID, artist?.mbid)
             .set(ARTIST.CREATED_AT, artist?.createdAt)
             .set(ARTIST.UPDATED_AT, artist?.updatedAt)
-            .set(ARTIST.COVER_ID, artist?.cover?.id)
             .execute()
 
         dsl.insertInto(ALBUM)
             .set(ALBUM.ID, album?.id)
             .set(ALBUM.TITLE, album?.title)
-            .set(ALBUM.YEAR, album?.year)
             .set(ALBUM.MBID, album?.mbid)
+            .set(ALBUM.COVER_ID, album?.cover?.id)
             .set(ALBUM.CREATED_AT, album?.createdAt)
             .set(ALBUM.UPDATED_AT, album?.updatedAt)
             .set(ALBUM.COVER_UPDATED_AT, album?.coverUpdatedAt)
-            .set(ALBUM.COVER_ID, album?.cover?.id)
-            .execute()
-
-        dsl.insertInto(SONG)
-            .set(SONG.ID, song?.id)
-            .set(SONG.TITLE, song?.title)
-            .set(SONG.ALBUM_ID, album?.id)
-            .set(SONG.LIKE, song?.like)
-            .set(SONG.DURATION, song?.duration)
-            .set(SONG.N, song?.n)
-            .set(SONG.PATH, song?.path)
-            .set(SONG.ACOUSTID, song?.acoustid)
-            .set(SONG.YEAR, song?.year)
-            .set(SONG.FORMAT, song?.format)
-            .set(SONG.MBID, song?.mbid)
-            .set(SONG.CREATED_AT, song?.createdAt)
-            .set(SONG.LAST_UPDATED, song?.lastUpdated)
-            .set(SONG.ALBUM_ID, song?.album?.id)
-            .execute()
-
-        dsl.insertInto(SONG_TO_ARTIST_LINK)
-            .set(SONG_TO_ARTIST_LINK.SONG_ID, song?.id)
-            .set(SONG_TO_ARTIST_LINK.ARTIST_ID, artist?.id)
+            .set(ALBUM.YEAR, album?.year)
             .execute()
 
         dsl.insertInto(ALBUM_TO_ARTIST_LINK)
@@ -140,32 +105,41 @@ class SongDaoIntegrationTest : IntegrationTest() {
     }
 
     @Test
-    fun `test fetchAllSongs should return all songs`() {
+    fun `test getAllAlbums returns a list of albums with cover and artist`() {
         // Act
-        val result = songDao.getAllSongs()
+        val result = albumDao.getAllAlbums()
 
         // Assert
         assertThat(result)
-            .isEqualTo(listOf(song))
+            .isEqualTo(listOf(album))
     }
 
     @Test
-    fun `test getSongByArtistId should return songs for the given artist`() {
+    fun `test getAlbumById returns an album with cover and artist when found`() {
         // Act
-        val result = songDao.getSongByArtistId(artist!!.id)
+        val result = albumDao.getAlbumById(1)
 
         // Assert
         assertThat(result)
-            .isEqualTo(listOf(song))
+            .isEqualTo(album)
     }
 
     @Test
-    fun `test getSongFromAlbumById should return songs for the given album`() {
+    fun `test getAlbumById returns null when album not found`() {
         // Act
-        val result = songDao.getSongFromAlbumById(album!!.id)
+        val result = albumDao.getAlbumById(999)
+
+        // Assert
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun `test getAlbumsByArtistId returns albums related to an artist`() {
+        // Act
+        val result = albumDao.getAlbumsByArtistId(1)
 
         // Assert
         assertThat(result)
-            .isEqualTo(listOf(song))
+            .isEqualTo(listOf(album))
     }
 }

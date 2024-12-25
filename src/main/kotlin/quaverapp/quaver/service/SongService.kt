@@ -6,9 +6,7 @@ import quaverapp.quaver.model.Song
 
 @Service
 class SongService(private val songDao: SongDao) {
-    fun getAllSongs(): List<Song> {
-        return songDao.fetchAllSongs()
-    }
+    fun getAllSongs(): List<Song> = songDao.getAllSongs()
 
     fun getSongByArtistId(id: Int) = songDao.getSongByArtistId(id)
 

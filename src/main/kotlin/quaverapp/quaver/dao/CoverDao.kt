@@ -7,11 +7,9 @@ import quaverapp.quaver.model.Cover
 import java.util.Optional
 
 @Repository
-class CoverDao(private val dsl: DSLContext) {
-    fun getById(id: Int): Cover? {
-        return dsl.select(*COVER.fields())
-            .from(COVER)
-            .where(COVER.ID.eq(id))
-            .fetchOne { record -> record.into(Cover::class.java) }
-    }
+class CoverDao(private val dsl: DslProvider) {
+
+    fun getById(id: Int): Cover? = dsl.selectCover()
+        .where(COVER.ID.eq(id))
+        .fetchOne { it.into(Cover::class.java) }
 }

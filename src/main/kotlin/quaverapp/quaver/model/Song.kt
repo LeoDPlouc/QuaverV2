@@ -3,16 +3,16 @@ package quaverapp.quaver.model
 import java.time.LocalDateTime
 
 data class Song(
-    val id: UInt,
+    val id: Int,
     val title: String,
-    val n: UInt,
-    val duration: UInt,
+    val n: Int,
+    val duration: Int,
     val like: Like = Like.Nothing,
     val artists: List<Artist>,
     val album: Album,
     val path: String,
     val acoustid: String,
-    val year: UInt,
+    val year: Int,
     val format: String,
     val mbid: String,
     val createdAt: LocalDateTime,

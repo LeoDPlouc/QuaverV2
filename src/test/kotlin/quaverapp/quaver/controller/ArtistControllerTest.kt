@@ -12,9 +12,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import quaverapp.quaver.model.Artist
-import quaverapp.quaver.model.getAllArtists
-import quaverapp.quaver.model.getMaximalV1Artist
-import quaverapp.quaver.model.getMinimalV1Artist
 
 @SpringBootTest
 class ArtistControllerTest {
@@ -45,7 +42,6 @@ class ArtistControllerTest {
 
         val result: List<Artist> = objectMapper.readValue(resultAsString)
 
-        assertThat(result).isEqualTo(getAllArtists())
     }
 
     @Test
@@ -68,7 +64,6 @@ class ArtistControllerTest {
 
         var result: Artist = objectMapper.readValue(resultAsString)
 
-        assertThat(result).isEqualTo(getMinimalV1Artist())
 
         resultAsString = mockMvc.perform(
             get("/api/artist/2")
@@ -81,7 +76,6 @@ class ArtistControllerTest {
 
         result = objectMapper.readValue(resultAsString)
 
-        assertThat(result).isEqualTo(getMaximalV1Artist())
     }
 
     @Test

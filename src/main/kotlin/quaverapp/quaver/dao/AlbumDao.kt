@@ -1,48 +1,24 @@
 package quaverapp.quaver.dao
 
-import org.jooq.DSLContext
 import org.jooq.generated.quaver.public.tables.references.ALBUM
-import org.jooq.generated.quaver.public.tables.references.ARTIST
-import org.jooq.generated.quaver.public.tables.references.COVER
-import org.jooq.impl.DSL.row
+import org.jooq.generated.quaver.public.tables.references.ALBUM_TO_ARTIST_LINK
 import org.springframework.stereotype.Repository
-import quaverapp.quaver.dao.dto.AlbumDbDto
-import quaverapp.quaver.dao.mapper.AlbumDbMapper
 import quaverapp.quaver.model.Album
 
 @Repository
 class AlbumDao(
-    val dsl: DSLContext,
-    val albumDbMapper: AlbumDbMapper
+    val dsl: DslProvider,
 ) {
-    fun getAllAlbums(): List<Album> {
-        return getSelectDsl()
-            .fetch { it.into(AlbumDbDto::class.java) }
-            .mapNotNull(albumDbMapper::toModel)
-    }
+    fun getAllAlbums(): List<Album> = dsl.selectAlbum()
+        .fetch { it.into(Album::class.java) }
 
-    fun getAlbumById(id: Int): Album? {
-        return getSelectDsl()
-            .where(ALBUM.ID.eq(id))
-            .fetchOne { it.into(AlbumDbDto::class.java) }
-            ?.let(albumDbMapper::toModel)
-    }
+    fun getAlbumById(id: Int): Album? = dsl.selectAlbum()
+        .where(ALBUM.ID.eq(id))
+        .fetchOne { it.into(Album::class.java) }
 
-    fun getAlbumsByArtistId(id: Int): List<Album> {
-        return getSelectDsl()
-            .where(ALBUM.albumToArtistLink().ARTIST_ID.eq(id))
-            .fetch { it.into(AlbumDbDto::class.java) }
-            .mapNotNull(albumDbMapper::toModel)
-    }
-
-    private fun getSelectDsl() = dsl.select(
-        *ALBUM.fields(),
-        row(*COVER.fields())
-            .`as`("cover"),
-        row(*ARTIST.fields())
-            .`as`("artist")
-    )
-        .from(ALBUM)
-        .leftJoin(COVER)
-        .on(ALBUM.COVER_ID.eq(COVER.ID))
+    fun getAlbumsByArtistId(id: Int): List<Album> = dsl.selectAlbum()
+        .leftJoin(ALBUM_TO_ARTIST_LINK)
+        .on(ALBUM_TO_ARTIST_LINK.ALBUM_ID.eq(ALBUM.ID))
+        .where(ALBUM_TO_ARTIST_LINK.ARTIST_ID.eq(id))
+        .fetch { it.into(Album::class.java) }
 }

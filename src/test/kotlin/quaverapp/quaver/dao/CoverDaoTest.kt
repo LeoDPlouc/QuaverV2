@@ -1,28 +1,58 @@
 package quaverapp.quaver.dao
 
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
+import org.jooq.generated.quaver.public.tables.references.COVER
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.jdbc.Sql
-import quaverapp.quaver.model.getMinimalV1Cover
+import quaverapp.quaver.IntegrationTest
+import quaverapp.quaver.model.Cover
+import kotlin.test.assertNull
 
-@SpringBootTest
-class CoverDaoTest{
+class CoverDaoTest : IntegrationTest() {
 
     @Autowired
-    private lateinit var coverDao: CoverDao
+    lateinit var coverDao: CoverDao
 
-    @Test
-    @Sql(scripts = [
-        "classpath:sql/create-schema.sql",
-        "classpath:sql/cover.sql"
-    ])
-    fun should_get_cover() {
-        val cover = coverDao.getById(1)
+    var cover: Cover? = null
 
-        assertThat(cover).isNotNull
-        assertThat(cover).isEqualTo(getMinimalV1Cover())
+    @BeforeEach
+    fun setUp() {
+        cover = Cover(
+            id = 1,
+            tinyUrl = "http://example.com/tiny.jpg",
+            smallUrl = "http://example.com/small.jpg",
+            mediumUrl = "http://example.com/medium.jpg",
+            largeUrl = "http://example.com/large.jpg",
+            veryLargeUrl = "http://example.com/very_large.jpg",
+        )
+
+        dsl.insertInto(COVER)
+            .set(COVER.ID, cover?.id)
+            .set(COVER.TINY_URL, cover?.tinyUrl)
+            .set(COVER.SMALL_URL, cover?.smallUrl)
+            .set(COVER.MEDIUM_URL, cover?.mediumUrl)
+            .set(COVER.LARGE_URL, cover?.largeUrl)
+            .set(COVER.VERY_LARGE_URL, cover?.veryLargeUrl)
+            .execute()
     }
 
+    @Test
+    fun `test getById returns a cover when found`() {
+        // Act
+        val result = coverDao.getById(1)
+
+        // Assert
+        Assertions.assertThat(result)
+            .isEqualTo(cover)
+    }
+
+    @Test
+    fun `test getById returns null when not found`() {
+        // Act
+        val result = coverDao.getById(999)
+
+        // Assert
+        assertNull(result)
+    }
 }
