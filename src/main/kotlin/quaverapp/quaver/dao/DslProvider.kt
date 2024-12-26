@@ -25,7 +25,12 @@ class DslProvider(val dsl: DSLContext) {
         *ALBUM.fields(),
         row(*COVER.fields())
             .`as`("cover"),
-        multiset(selectArtist())
+        multiset(
+            selectArtist()
+                .leftJoin(ALBUM_TO_ARTIST_LINK)
+                .on(ALBUM_TO_ARTIST_LINK.ALBUM_ID.eq(ALBUM.ID))
+                .where(ALBUM_TO_ARTIST_LINK.ARTIST_ID.eq(ARTIST.ID))
+        )
             .`as`("artists")
             .convertFrom { it.into(Artist::class.java) },
         multiset(selectAlbumJoining())
@@ -40,6 +45,7 @@ class DslProvider(val dsl: DSLContext) {
         .from(JOINING)
         .leftJoin(ALBUM_TO_JOINING_LINK)
         .on(ALBUM_TO_JOINING_LINK.JOINING_ID.eq(JOINING.ID))
+        .where(ALBUM_TO_JOINING_LINK.ALBUM_ID.eq(ALBUM.ID))
 
     fun selectCover() = dsl.select(*COVER.fields())
         .from(COVER)
@@ -49,7 +55,12 @@ class DslProvider(val dsl: DSLContext) {
         multiset(selectAlbum())
             .`as`("album")
             .convertFrom { it.into(Album::class.java) },
-        multiset(selectArtist())
+        multiset(
+            selectArtist()
+                .leftJoin(SONG_TO_ARTIST_LINK)
+                .on(SONG_TO_ARTIST_LINK.SONG_ID.eq(SONG.ID))
+                .where(SONG_TO_ARTIST_LINK.ARTIST_ID.eq(ARTIST.ID))
+        )
             .`as`("artists")
             .convertFrom { it.into(Artist::class.java) },
         multiset(selectSongJoining())
@@ -63,6 +74,7 @@ class DslProvider(val dsl: DSLContext) {
 
     fun selectSongJoining() = dsl.select(*JOINING.fields())
         .from(JOINING)
-        .leftJoin(SONG_TO_JOINING_LINK)
+        .innerJoin(SONG_TO_JOINING_LINK)
         .on(SONG_TO_JOINING_LINK.JOINING_ID.eq(JOINING.ID))
+        .where(SONG_TO_JOINING_LINK.SONG_ID.eq(SONG.ID))
 }

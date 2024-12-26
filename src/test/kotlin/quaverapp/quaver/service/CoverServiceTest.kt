@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import quaverapp.quaver.TestSuite
+import quaverapp.quaver.UnitTest
 import quaverapp.quaver.dao.CoverDao
 import quaverapp.quaver.model.Cover
 import quaverapp.quaver.service.exception.CoverNotFoundException
 
-class CoverServiceTest : TestSuite() {
+class CoverServiceTest : UnitTest() {
 
     @Mock
     lateinit var coverDao: CoverDao
@@ -22,19 +22,11 @@ class CoverServiceTest : TestSuite() {
     @Test
     fun `getById should return cover when cover is found`() {
         // Arrange
-        val coverId = 1
-        val expectedCover = Cover(
-            id = coverId,
-            tinyUrl = "http://example.com/tiny.jpg",
-            smallUrl = "http://example.com/small.jpg",
-            mediumUrl = "http://example.com/medium.jpg",
-            largeUrl = "http://example.com/large.jpg",
-            veryLargeUrl = "http://example.com/verylarge.jpg"
-        )
-        `when`(coverDao.getById(coverId)).thenReturn(expectedCover)
+        val expectedCover = createCover()
+        `when`(coverDao.getById(1)).thenReturn(expectedCover)
 
         // Act
-        val result = coverService.getById(coverId)
+        val result = coverService.getById(1)
 
         // Assert
         assertThat(result)
@@ -44,11 +36,10 @@ class CoverServiceTest : TestSuite() {
     @Test
     fun `getById should throw CoverNotFoundException when cover is not found`() {
         // Arrange
-        val coverId = 1
-        `when`(coverDao.getById(coverId)).thenReturn(null)
+        `when`(coverDao.getById(1)).thenReturn(null)
 
         // Act
-        var thrown = catchException { coverService.getById(coverId) }
+        val thrown = catchException { coverService.getById(1) }
 
         // Assert
         assertThat(thrown)

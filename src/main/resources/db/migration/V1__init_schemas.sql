@@ -20,7 +20,7 @@ CREATE TABLE joining (
     id serial primary key,
     n int,
     artist_id int references artist(id) on delete cascade,
-    joinphrase varchar(20)
+    joinphrase varchar(50)
 );
 
 CREATE TABLE album (

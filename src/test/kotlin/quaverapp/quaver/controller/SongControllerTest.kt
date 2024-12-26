@@ -1,21 +1,21 @@
 package quaverapp.quaver.controller
 
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.get
 import quaverapp.quaver.ControllerTest
-import quaverapp.quaver.model.Cover
+import quaverapp.quaver.model.Song
 
-class CoverControllerTest : ControllerTest() {
+class SongControllerTest : ControllerTest() {
 
     @Test
-    fun `should return cover by id`() {
+    fun `should return all songs`() {
         // Arrange
-        val cover = createCover()
+        val song = createSong()
 
         // Act
-        val resultAsString = mockMvc.get("/api/cover/${cover.id}")
+        val resultAsString = mockMvc.get("/api/song")
             .andExpect {
                 status { isOk() }
                 content { contentType(APPLICATION_JSON) }
@@ -25,9 +25,9 @@ class CoverControllerTest : ControllerTest() {
             .contentAsString
 
         // Assert
-        val result = objectMapper.readValue(resultAsString, Cover::class.java)
+        val result = objectMapper.readValue<List<Song>>(resultAsString, listType(Song::class.java))
 
-        assertThat(result)
-            .isEqualTo(cover)
+        Assertions.assertThat(result)
+            .isEqualTo(listOf(song))
     }
 }

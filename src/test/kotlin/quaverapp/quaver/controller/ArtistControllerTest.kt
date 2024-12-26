@@ -1,88 +1,103 @@
 package quaverapp.quaver.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.context.jdbc.Sql
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.get
+import quaverapp.quaver.ControllerTest
+import quaverapp.quaver.model.Album
 import quaverapp.quaver.model.Artist
+import quaverapp.quaver.model.Song
 
-@SpringBootTest
-class ArtistControllerTest {
-
-    @Autowired
-    private lateinit var mockMvc: MockMvc
-
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
+class ArtistControllerTest : ControllerTest() {
 
     @Test
-    @Sql(
-        scripts = [
-            "classpath:sql/create-schema.sql",
-            "classpath:sql/cover.sql",
-            "classpath:sql/artist.sql",
-        ]
-    )
-    fun should_get_all_artists() {
-        val resultAsString = mockMvc.perform(
-            get("/api/artist")
-                .contentType(APPLICATION_JSON)
-        )
-            .andExpect(status().isOk)
+    fun `should return all artists`() {
+        // Arrange
+        val artists = listOf(createArtist())
+
+        // Act
+        val resultAsString = mockMvc.get("/api/artist")
+            .andExpect {
+                status { isOk() }
+                content { contentType(APPLICATION_JSON) }
+            }
             .andReturn()
             .response
             .contentAsString
 
-        val result: List<Artist> = objectMapper.readValue(resultAsString)
+        // Assert
+        val result = objectMapper.readValue<List<Artist>>(resultAsString, listType(Artist::class.java))
 
+        assertThat(result)
+            .isEqualTo(artists)
     }
 
+
     @Test
-    @Sql(
-        scripts = [
-            "classpath:sql/create-schema.sql",
-            "classpath:sql/cover.sql",
-            "classpath:sql/artist.sql",
-        ]
-    )
-    fun getArtistById() {
-        var resultAsString = mockMvc.perform(
-            get("/api/artist/1")
-                .contentType(APPLICATION_JSON)
-        )
-            .andExpect(status().isOk)
+    fun `should return artist by id`() {
+        // Arrange
+        val artist = createArtist()
+
+        // Act
+        val resultAsString = mockMvc.get("/api/artist/${artist.id}")
+            .andExpect {
+                status { isOk() }
+                content { contentType(APPLICATION_JSON) }
+            }
             .andReturn()
             .response
             .contentAsString
 
-        var result: Artist = objectMapper.readValue(resultAsString)
+        // Assert
+        val result = objectMapper.readValue(resultAsString, Artist::class.java)
 
+        assertThat(result)
+            .isEqualTo(artist)
+    }
 
-        resultAsString = mockMvc.perform(
-            get("/api/artist/2")
-                .contentType(APPLICATION_JSON)
-        )
-            .andExpect(status().isOk)
+    @Test
+    fun `should return songs by artist id`() {
+        // Arrange
+        val songs = listOf(createSong())
+
+        // Act
+        val resultAsString = mockMvc.get("/api/artist/${songs.first().artists.first().id}/songs")
+            .andExpect {
+                status { isOk() }
+                content { contentType(APPLICATION_JSON) }
+            }
             .andReturn()
             .response
             .contentAsString
 
-        result = objectMapper.readValue(resultAsString)
+        // Assert
+        val result = objectMapper.readValue<List<Song>>(resultAsString, listType(Song::class.java))
 
+        assertThat(result)
+            .isEqualTo(songs)
     }
 
     @Test
-    fun getSongsByArtistId() {
-    }
+    fun `should return albums by artist id`() {
+        // Arrange
+        val album = createAlbum()
 
-    @Test
-    fun getAlbumByArtistId() {
+        // Act
+        val resultAsString = mockMvc.get("/api/artist/${album.artists.first().id}/albums")
+            .andExpect {
+                status { isOk() }
+                content { contentType(APPLICATION_JSON) }
+            }
+            .andReturn()
+            .response
+            .contentAsString
+
+        // Assert
+        val result = objectMapper.readValue<List<Album>>(resultAsString, listType(Album::class.java))
+
+        assertThat(result)
+            .isEqualTo(listOf(album))
+
     }
 }

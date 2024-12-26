@@ -1,146 +1,19 @@
 package quaverapp.quaver.dao
 
 import org.assertj.core.api.Assertions.assertThat
-import org.jooq.generated.quaver.public.tables.references.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import quaverapp.quaver.IntegrationTest
-import quaverapp.quaver.model.*
-import java.time.LocalDateTime
 
-class SongDaoIntegrationTest : IntegrationTest() {
+class SongDaoTest : IntegrationTest() {
     @Autowired
     private lateinit var songDao: SongDao
 
-    var artist: Artist? = null
-    var album: Album? = null
-    var song: Song? = null
-
-    @BeforeEach
-    fun setup() {
-        artist = Artist(
-            id = 1,
-            mbid = "mbid",
-            cover = Cover(
-                id = 2,
-                tinyUrl = "http://example.com/tiny.jpg",
-                smallUrl = "http://example.com/small.jpg",
-                mediumUrl = "http://example.com/medium.jpg",
-                largeUrl = "http://example.com/large.jpg",
-                veryLargeUrl = "http://example.com/very_large.jpg",
-            ),
-            createdAt = LocalDateTime.of(2000, 10, 10, 0, 0, 0),
-            updatedAt = LocalDateTime.of(2000, 10, 10, 0, 0, 0),
-            name = "name"
-        )
-
-        album = Album(
-            id = 1,
-            mbid = "mbid",
-            cover = Cover(
-                id = 1,
-                tinyUrl = "http://example.com/tiny.jpg",
-                smallUrl = "http://example.com/small.jpg",
-                mediumUrl = "http://example.com/medium.jpg",
-                largeUrl = "http://example.com/large.jpg",
-                veryLargeUrl = "http://example.com/very_large.jpg",
-            ),
-            createdAt = LocalDateTime.of(2000, 10, 10, 0, 0, 0),
-            updatedAt = LocalDateTime.of(2000, 10, 10, 0, 0, 0),
-            year = 2000,
-            title = "title",
-            joinings = emptyList(),
-            coverUpdatedAt = LocalDateTime.of(2000, 10, 10, 0, 0, 0),
-            artists = listOf(artist!!),
-        )
-
-        song = Song(
-            id = 1,
-            n = 1,
-            title = "title",
-            artists = listOf(artist!!),
-            createdAt = LocalDateTime.of(2000, 10, 10, 0, 0, 0),
-            joinings = emptyList(),
-            mbid = "mbid",
-            year = 2000,
-            album = album!!,
-            like = Like.Like,
-            path = "/path",
-            lastUpdated = LocalDateTime.of(2000, 10, 10, 0, 0, 0),
-            format = "mp3",
-            acoustid = "acoustid",
-            duration = 20
-        )
-
-        dsl.insertInto(COVER)
-            .set(COVER.ID, artist?.cover?.id)
-            .set(COVER.TINY_URL, artist?.cover?.tinyUrl)
-            .set(COVER.SMALL_URL, artist?.cover?.smallUrl)
-            .set(COVER.MEDIUM_URL, artist?.cover?.mediumUrl)
-            .set(COVER.LARGE_URL, artist?.cover?.largeUrl)
-            .set(COVER.VERY_LARGE_URL, artist?.cover?.veryLargeUrl)
-            .execute()
-
-        dsl.insertInto(COVER)
-            .set(COVER.ID, album?.cover?.id)
-            .set(COVER.TINY_URL, album?.cover?.tinyUrl)
-            .set(COVER.SMALL_URL, album?.cover?.smallUrl)
-            .set(COVER.MEDIUM_URL, album?.cover?.mediumUrl)
-            .set(COVER.LARGE_URL, album?.cover?.largeUrl)
-            .set(COVER.VERY_LARGE_URL, album?.cover?.veryLargeUrl)
-            .execute()
-
-        dsl.insertInto(ARTIST)
-            .set(ARTIST.ID, artist?.id)
-            .set(ARTIST.NAME, artist?.name)
-            .set(ARTIST.MBID, artist?.mbid)
-            .set(ARTIST.CREATED_AT, artist?.createdAt)
-            .set(ARTIST.UPDATED_AT, artist?.updatedAt)
-            .set(ARTIST.COVER_ID, artist?.cover?.id)
-            .execute()
-
-        dsl.insertInto(ALBUM)
-            .set(ALBUM.ID, album?.id)
-            .set(ALBUM.TITLE, album?.title)
-            .set(ALBUM.YEAR, album?.year)
-            .set(ALBUM.MBID, album?.mbid)
-            .set(ALBUM.CREATED_AT, album?.createdAt)
-            .set(ALBUM.UPDATED_AT, album?.updatedAt)
-            .set(ALBUM.COVER_UPDATED_AT, album?.coverUpdatedAt)
-            .set(ALBUM.COVER_ID, album?.cover?.id)
-            .execute()
-
-        dsl.insertInto(SONG)
-            .set(SONG.ID, song?.id)
-            .set(SONG.TITLE, song?.title)
-            .set(SONG.ALBUM_ID, album?.id)
-            .set(SONG.LIKE, song?.like)
-            .set(SONG.DURATION, song?.duration)
-            .set(SONG.N, song?.n)
-            .set(SONG.PATH, song?.path)
-            .set(SONG.ACOUSTID, song?.acoustid)
-            .set(SONG.YEAR, song?.year)
-            .set(SONG.FORMAT, song?.format)
-            .set(SONG.MBID, song?.mbid)
-            .set(SONG.CREATED_AT, song?.createdAt)
-            .set(SONG.LAST_UPDATED, song?.lastUpdated)
-            .set(SONG.ALBUM_ID, song?.album?.id)
-            .execute()
-
-        dsl.insertInto(SONG_TO_ARTIST_LINK)
-            .set(SONG_TO_ARTIST_LINK.SONG_ID, song?.id)
-            .set(SONG_TO_ARTIST_LINK.ARTIST_ID, artist?.id)
-            .execute()
-
-        dsl.insertInto(ALBUM_TO_ARTIST_LINK)
-            .set(ALBUM_TO_ARTIST_LINK.ALBUM_ID, album?.id)
-            .set(ALBUM_TO_ARTIST_LINK.ARTIST_ID, artist?.id)
-            .execute()
-    }
-
     @Test
     fun `test fetchAllSongs should return all songs`() {
+        // Arrange
+        val song = createSong()
+
         // Act
         val result = songDao.getAllSongs()
 
@@ -151,8 +24,11 @@ class SongDaoIntegrationTest : IntegrationTest() {
 
     @Test
     fun `test getSongByArtistId should return songs for the given artist`() {
+        // Arrange
+        val song = createSong()
+
         // Act
-        val result = songDao.getSongByArtistId(artist!!.id)
+        val result = songDao.getSongByArtistId(song.artists.first().id)
 
         // Assert
         assertThat(result)
@@ -161,8 +37,11 @@ class SongDaoIntegrationTest : IntegrationTest() {
 
     @Test
     fun `test getSongFromAlbumById should return songs for the given album`() {
+        //Arrange
+        val song = createSong()
+
         // Act
-        val result = songDao.getSongFromAlbumById(album!!.id)
+        val result = songDao.getSongFromAlbumById(song.album.id)
 
         // Assert
         assertThat(result)
